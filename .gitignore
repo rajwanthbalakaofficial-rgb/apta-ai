@@ -1,0 +1,23 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment & API keys
+.env
+.env.local
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Logs & temp test outputs
+*.log
+test_output.txt
+
+# IDE / System
+.vscode/
+.idea/
+.DS_Store
