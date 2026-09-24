@@ -1,27 +1,49 @@
 /* ==========================================================================
-   apta AI - Interactive Application Engine JavaScript
+   apta AI - Universal Application Engine JavaScript (Hybrid Local & Web Client)
    ========================================================================== */
 
 let currentMode = "universal";
-const API_BASE_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" 
-    ? "http://localhost:8000" 
-    : "http://localhost:8000";
+const API_BASE_URL = "http://localhost:8000";
+
+const SYSTEM_PROMPTS = {
+    universal: `You are apta AI (ఆప్త AI), a standalone Universal Autonomous AI Agent & Pair Programming Assistant created by Rajwanth Balaka.
+You operate across software development, writing, research, and project engineering.
+Communicate warmly in Teluglish (Tanglish - Telugu written in English script), Telugu, or English based on user preference.`,
+    coding: `You are apta AI, an intelligent AI Coding Assistant created by Rajwanth Balaka. Provide accurate code, debugging, and advice in Teluglish or English.`
+};
 
 document.addEventListener("DOMContentLoaded", () => {
     checkHealth();
+    initKeyModal();
 });
+
+function initKeyModal() {
+    const savedKey = localStorage.getItem("APTA_GEMINI_KEY") || "";
+    if (savedKey) {
+        document.getElementById("api-status-text").innerText = "Web Live (Gemini Ready)";
+    }
+}
 
 async function checkHealth() {
     try {
-        const res = await fetch(`${API_BASE_URL}/api/health`);
+        const res = await fetch(`${API_BASE_URL}/api/health`, { signal: AbortSignal.timeout(2000) });
         const data = await res.json();
         const statusElem = document.getElementById("api-status-text");
         if (data.status === "online") {
-            statusElem.innerText = data.gemini_status === "configured" ? "Online (Gemini Ready)" : "Online (Set API Key)";
+            statusElem.innerText = data.gemini_status === "configured" ? "Local Backend (Gemini Ready)" : "Local Backend (Set Key)";
+            document.querySelector(".dot").className = "dot green";
+            return;
         }
     } catch (err) {
-        document.getElementById("api-status-text").innerText = "Web Interface (Backend Offline)";
-        document.querySelector(".dot").className = "dot yellow";
+        const savedKey = localStorage.getItem("APTA_GEMINI_KEY");
+        const statusElem = document.getElementById("api-status-text");
+        if (savedKey) {
+            statusElem.innerText = "Web Client (Gemini Active)";
+            document.querySelector(".dot").className = "dot green";
+        } else {
+            statusElem.innerText = "Web Client (Key Required)";
+            document.querySelector(".dot").className = "dot yellow";
+        }
     }
 }
 
@@ -39,6 +61,16 @@ function setMode(mode) {
     document.getElementById("mode-badge").innerText = mode.toUpperCase();
 }
 
+function promptApiKey() {
+    const currentKey = localStorage.getItem("APTA_GEMINI_KEY") || "";
+    const key = prompt("Mama, Enter your Gemini API Key to enable direct Web Chat:", currentKey);
+    if (key !== null) {
+        localStorage.setItem("APTA_GEMINI_KEY", key.trim());
+        checkHealth();
+        alert("Gemini API Key saved! Now you can chat directly in the browser.");
+    }
+}
+
 function handleKeyDown(event) {
     if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();
@@ -53,29 +85,25 @@ function sendQuickPrompt(promptText) {
 
 async function sendMessage() {
     const textarea = document.getElementById("user-input");
-    const message = textarea.value.strip ? textarea.value.trim() : textarea.value;
+    const message = textarea.value.trim();
     
     if (!message) return;
     
-    // Hide welcome card if present
     const welcomeCard = document.querySelector(".welcome-card");
     if (welcomeCard) welcomeCard.style.display = "none";
     
-    // Render User Message Bubble
     appendMessage(message, "user");
     textarea.value = "";
 
-    // Show Tool Activity Bar
-    showToolActivity("apta AI is thinking & executing tools...");
+    showToolActivity("apta AI is thinking & generating response...");
     
+    // Try Local Backend First
     try {
         const response = await fetch(`${API_BASE_URL}/api/chat`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                message: message,
-                mode: currentMode
-            })
+            body: JSON.stringify({ message: message, mode: currentMode }),
+            signal: AbortSignal.timeout(3000)
         });
         
         const data = await response.json();
@@ -83,12 +111,54 @@ async function sendMessage() {
         
         if (data.status === "success") {
             appendMessage(data.reply, "bot");
-        } else {
-            appendMessage("Mama, error occurred: " + (data.detail || "Server error"), "bot");
+            return;
         }
     } catch (err) {
+        // Fall back to Direct Browser Gemini API
+    }
+
+    // Direct Browser Gemini Call
+    let apiKey = localStorage.getItem("APTA_GEMINI_KEY");
+    if (!apiKey) {
         hideToolActivity();
-        appendMessage("Mama, Web UI is live! To execute live tools & Gemini API, start backend with `python run_app.py` on your machine.", "bot");
+        apiKey = prompt("Mama, Browser lo direct ga chat cheyaniki mee Gemini API Key ivvandi (Saved locally in browser):");
+        if (apiKey) {
+            apiKey = apiKey.trim();
+            localStorage.setItem("APTA_GEMINI_KEY", apiKey);
+            showToolActivity("Connecting to Gemini API...");
+        } else {
+            appendMessage("Mama, Web UI is live! Please set your Gemini API Key using the Key button at the top or start local backend with `python run_app.py`.", "bot");
+            return;
+        }
+    }
+
+    try {
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+        const sysInstruction = SYSTEM_PROMPTS[currentMode] || SYSTEM_PROMPTS.universal;
+
+        const res = await fetch(geminiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                system_instruction: { parts: [{ text: sysInstruction }] },
+                contents: [{ parts: [{ text: message }] }]
+            })
+        });
+
+        const data = await res.json();
+        hideToolActivity();
+
+        if (data.candidates && data.candidates[0].content.parts[0].text) {
+            const botReply = data.candidates[0].content.parts[0].text;
+            appendMessage(botReply, "bot");
+        } else if (data.error) {
+            appendMessage(`Mama, API Error: ${data.error.message}`, "bot");
+        } else {
+            appendMessage("Mama, Gemini returned an empty response. Try asking again!", "bot");
+        }
+    } catch (e) {
+        hideToolActivity();
+        appendMessage(`Mama, API call failed: ${e.message}. Check your API Key!`, "bot");
     }
 }
 
@@ -114,7 +184,6 @@ function appendMessage(text, sender) {
     msgBubble.appendChild(content);
     chatContainer.appendChild(msgBubble);
     
-    // Auto scroll to bottom
     chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 

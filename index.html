@@ -65,6 +65,9 @@
                     <span class="badge" id="mode-badge">UNIVERSAL</span>
                 </div>
                 <div class="bar-right">
+                    <button class="icon-btn" title="Set Gemini API Key" onclick="promptApiKey()" style="margin-right: 8px;">
+                        <i class="fa-solid fa-key"></i> API Key
+                    </button>
                     <button class="icon-btn" title="Clear Chat" onclick="clearChat()">
                         <i class="fa-solid fa-trash-can"></i> Clear
                     </button>
@@ -78,14 +81,14 @@
                     <h3>Namaste / Hello Mama! Nenu apta AI!</h3>
                     <p>I am your Universal Autonomous AI Agent & Pair Programming Assistant created by Rajwanth Balaka.</p>
                     <div class="suggestion-chips">
-                        <button onclick="sendQuickPrompt('Create a Python script to scan directory files.')">
-                            💡 Create Python Scanner
-                        </button>
-                        <button onclick="sendQuickPrompt('Search for python files in current folder.')">
-                            🔍 Find Python Files
-                        </button>
                         <button onclick="sendQuickPrompt('Mama, project architecture explain cheyyi.')">
                             💬 Ask Architecture Question
+                        </button>
+                        <button onclick="sendQuickPrompt('Write a story idea about an AI developer and his best friend.')">
+                            📖 Story Writing Assistance
+                        </button>
+                        <button onclick="sendQuickPrompt('Mama, python script example rai.')">
+                            💡 Python Script Example
                         </button>
                     </div>
                 </div>
@@ -102,7 +105,7 @@
                 <div class="input-box">
                     <textarea 
                         id="user-input" 
-                        placeholder="Type your instruction or message to apta AI (e.g., 'Mama, script rai')..."
+                        placeholder="Type your instruction or message to apta AI (e.g., 'Mama, story idea rai')..."
                         rows="1"
                         onkeydown="handleKeyDown(event)"
                     ></textarea>
