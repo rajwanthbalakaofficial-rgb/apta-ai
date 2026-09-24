@@ -1,106 +1,100 @@
 """
-Verification & Automated Test Suite for apta AI Universal Agent.
+Verification & Automated Test Suite for apta AI Antigravity Twin Engine.
 """
 
 import os
 from pathlib import Path
-from tools import (
-    read_file, 
-    write_file, 
-    replace_in_file,
-    list_dir, 
-    find_files,
-    search_files,
-    fetch_web_content,
-    execute_command, 
-    get_stress_recommendation
+from core.tools import (
+    view_file,
+    replace_file_content,
+    write_to_file,
+    grep_search,
+    find_by_name,
+    list_dir,
+    run_command
 )
-from agent import AptaAgent
+from core.artifacts import ArtifactManager
+from core.skills import SkillsLoader
+from core.subagents import SubagentManager
+from core.engine import AntigravityEngine
 
-def test_tools():
-    print("[1/3] Testing Universal Tool Suite implementations...")
-    test_file = "test_output.txt"
+def test_antigravity_tools():
+    print("[1/4] Testing Antigravity Tool Primitives...")
+    test_file = "test_antigravity.txt"
     
-    # Test write_file
-    res_write = write_file(test_file, "Hello from apta AI universal test suite!")
-    assert "Successfully wrote" in res_write, f"write_file failed: {res_write}"
+    # Write to file
+    res_w = write_to_file(test_file, "Line 1: Antigravity Twin\nLine 2: Test Suite")
+    assert "Successfully wrote" in res_w
     
-    # Test replace_in_file
-    res_replace = replace_in_file(test_file, "universal", "UNIVERSAL")
-    assert "Successfully updated" in res_replace, f"replace_in_file failed: {res_replace}"
+    # View file
+    res_v = view_file(test_file, 1, 2)
+    assert "Line 1:" in res_v
     
-    # Test read_file
-    res_read = read_file(test_file)
-    assert "UNIVERSAL" in res_read, f"read_file failed: {res_read}"
+    # Replace file content
+    res_r = replace_file_content(test_file, "Twin", "ENGINE")
+    assert "Successfully updated" in res_r
     
-    # Test list_dir
-    res_list = list_dir(".")
-    assert "Contents of" in res_list, f"list_dir failed: {res_list}"
+    # Grep search
+    res_g = grep_search("ENGINE", ".")
+    assert "ENGINE" in res_g
     
-    # Test find_files
-    res_find = find_files("*.py", ".")
-    assert "test_agent.py" in res_find, f"find_files failed: {res_find}"
+    # Find by name
+    res_f = find_by_name("*.py", ".")
+    assert "test_agent.py" in res_f
     
-    # Test search_files
-    res_search = search_files("AptaAgent", ".")
-    assert "agent.py" in res_search or "matches" in res_search, f"search_files failed: {res_search}"
-
-    # Test execute_command
-    res_cmd = execute_command("echo apta_ai_test")
-    assert "apta_ai_test" in res_cmd or "executed with return code" in res_cmd, f"execute_command failed: {res_cmd}"
+    # List dir
+    res_l = list_dir(".")
+    assert "Contents of" in res_l
     
-    # Test biofeedback recommendation
-    res_rec = get_stress_recommendation(75.0, "High Stress")
-    assert "4-7-8 Breathing" in res_rec or "State:" in res_rec, f"recommendation failed: {res_rec}"
+    # Run command
+    res_c = run_command("echo Antigravity_OK")
+    assert "Antigravity_OK" in res_c or "executed" in res_c
     
-    # Cleanup
     if os.path.exists(test_file):
         os.remove(test_file)
-        
-    print("  [OK] All 9 Universal Tools passed successfully!")
+    print("  [OK] All 7 Antigravity tools passed successfully!")
 
-def test_agent_instance():
-    print("[2/3] Testing AptaAgent initialization in all modes...")
-    agent_universal = AptaAgent(mode="universal")
-    assert agent_universal.mode == "universal"
+def test_antigravity_modules():
+    print("[2/4] Testing Artifacts, Skills & Subagents Modules...")
+    art_mgr = ArtifactManager()
+    art = art_mgr.create_artifact("plan.md", "Plan Title", "# Plan Content")
+    assert art.filename == "plan.md"
     
-    agent_coding = AptaAgent(mode="coding")
-    assert agent_coding.mode == "coding"
+    skills = SkillsLoader()
+    summary = skills.get_skills_summary()
+    assert isinstance(summary, str)
     
-    agent_udvega = AptaAgent(mode="udvegadarshini")
-    assert agent_udvega.mode == "udvegadarshini"
-    
-    # Test message handling
-    reply = agent_universal.send_message("Hello mama", stress_context={"stress_score": 25.0})
-    assert len(reply) > 0, "Empty reply received from agent"
-    print("  [OK] Agent instance tests passed!")
+    sub = SubagentManager()
+    agent = sub.invoke_subagent("Planner", "System Planner", "Plan task")
+    assert agent.role == "System Planner"
+    print("  [OK] Modules test passed!")
 
-def test_fastapi_server():
-    print("[3/3] Testing FastAPI server endpoints...")
+def test_antigravity_engine():
+    print("[3/4] Testing Antigravity Trajectory Engine...")
+    engine = AntigravityEngine()
+    step = engine.execute_step("Mama, run Antigravity test trajectory")
+    assert step["step_index"] == 1
+    assert "user_input" in step
+    print("  [OK] Engine step execution passed!")
+
+def test_server():
+    print("[4/4] Testing App Server...")
     try:
-        from server import app
+        from app_server import app
         from fastapi.testclient import TestClient
         client = TestClient(app)
-        
-        # Test root endpoint
-        resp_root = client.get("/")
-        assert resp_root.status_code == 200
-        assert resp_root.json()["status"] == "online"
-        
-        # Test EEG sync endpoint
-        resp_eeg = client.post("/api/eeg-sync", json={"stress_score": 75.0, "state": "High Stress"})
-        assert resp_eeg.status_code == 200
-        assert resp_eeg.json()["status"] == "success"
-        
-        print("  [OK] FastAPI server tests passed!")
+        res = client.get("/api/health")
+        assert res.status_code == 200
+        print("  [OK] App Server endpoints passed!")
     except ImportError:
-        print("  [INFO] FastAPI package not installed yet. Skipping server HTTP tests (install via requirements.txt).")
+        print("  [INFO] FastAPI testclient optional, skipping HTTP endpoint test.")
 
 if __name__ == "__main__":
     print("==============================================")
-    print(" Running apta AI Universal Test Suite")
+    print(" Running apta AI Antigravity Twin Test Suite")
     print("==============================================")
-    test_tools()
-    test_agent_instance()
-    test_fastapi_server()
-    print("\n[SUCCESS] ALL TESTS PASSED! Universal apta AI is ready for action!")
+    test_antigravity_tools()
+    test_antigravity_modules()
+    test_antigravity_engine()
+    test_server()
+    print("\n[SUCCESS] ALL ANTIGRAVITY TWIN TESTS PASSED!")
