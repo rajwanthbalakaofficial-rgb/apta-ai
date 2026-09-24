@@ -60,11 +60,13 @@ body {
     border-bottom: 1px solid var(--border-color);
 }
 
-.brand-logo {
-    font-size: 24px;
-    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+.brand-logo-img {
+    width: 36px;
+    height: 36px;
     border-radius: 8px;
-    padding: 4px 10px;
+    border: 1px solid var(--accent-cyan);
+    box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+    object-fit: cover;
 }
 
 .brand-info h1 {
@@ -248,7 +250,16 @@ body {
     margin: auto;
 }
 
-.welcome-icon { font-size: 40px; margin-bottom: 10px; }
+.welcome-banner-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid var(--accent-cyan);
+    box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+    margin-bottom: 12px;
+    object-fit: cover;
+}
+
 .welcome-banner h2 { font-size: 18px; margin-bottom: 6px; }
 .welcome-banner p { font-size: 13px; color: var(--text-muted); margin-bottom: 18px; }
 
