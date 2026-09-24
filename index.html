@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>apta AI - Antigravity Studio Engine</title>
     <link rel="stylesheet" href="style.css">
-    <!-- FontAwesome & Marked.js & Mermaid.js -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
 </head>
 <body>
     <div class="antigravity-studio">
@@ -62,13 +60,13 @@
             <div class="sidebar-footer">
                 <div class="workspace-status">
                     <span class="dot green"></span>
-                    <span>Workspace Connected</span>
+                    <span id="api-status-text">Workspace Connected</span>
                 </div>
                 <div class="creator-tag">Antigravity Twin Engine by Rajwanth Balaka</div>
             </div>
         </aside>
 
-        <!-- Center Trajectory & Execution Workspace -->
+        <!-- Center Workspace Feed -->
         <main class="workspace-feed">
             <header class="feed-header">
                 <div class="header-title">
@@ -76,11 +74,11 @@
                     <span class="trajectory-badge" id="step-badge">STEP 1</span>
                 </div>
                 <div class="header-actions">
-                    <button class="action-btn" onclick="toggleArtifactDrawer()">
-                        <i class="fa-solid fa-box-archive"></i> Artifacts Drawer
-                    </button>
                     <button class="action-btn" onclick="promptApiKey()">
                         <i class="fa-solid fa-key"></i> API Key
+                    </button>
+                    <button class="action-btn" onclick="toggleArtifactDrawer()">
+                        <i class="fa-solid fa-box-archive"></i> Artifacts Drawer
                     </button>
                 </div>
             </header>
@@ -113,7 +111,7 @@
                 </div>
             </div>
 
-            <!-- Thinking & Tool Call Activity Toast -->
+            <!-- Thinking & Tool Activity Toast -->
             <div class="activity-toast" id="activity-toast" style="display: none;">
                 <i class="fa-solid fa-brain fa-spin"></i>
                 <span id="activity-toast-text">Antigravity Thinking & Trajectory Processing...</span>

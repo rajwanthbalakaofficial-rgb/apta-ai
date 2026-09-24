@@ -1,5 +1,5 @@
 /* ==========================================================================
-   apta AI - Antigravity Twin Studio Engine JavaScript
+   apta AI - Antigravity Twin Studio Engine JavaScript (Robust Engine)
    ========================================================================== */
 
 let stepIndex = 0;
@@ -7,7 +7,13 @@ let isDrawerOpen = false;
 const API_BASE_URL = "http://localhost:8000";
 
 document.addEventListener("DOMContentLoaded", () => {
-    mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+    try {
+        if (typeof mermaid !== "undefined") {
+            mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+        }
+    } catch (e) {
+        console.warn("Mermaid initialization deferred:", e);
+    }
     checkStatus();
 });
 
@@ -16,10 +22,15 @@ async function checkStatus() {
         const res = await fetch(`${API_BASE_URL}/api/health`, { signal: AbortSignal.timeout(2000) });
         const data = await res.json();
         if (data.status === "online") {
-            document.querySelector(".workspace-status span:nth-child(2)").innerText = "Antigravity Engine Active";
+            document.getElementById("api-status-text").innerText = "Antigravity Engine Active";
         }
     } catch (e) {
-        document.querySelector(".workspace-status span:nth-child(2)").innerText = "Studio Client (Web Mode)";
+        const savedKey = localStorage.getItem("APTA_GEMINI_KEY");
+        if (savedKey) {
+            document.getElementById("api-status-text").innerText = "Studio Client (Gemini Ready)";
+        } else {
+            document.getElementById("api-status-text").innerText = "Studio Client (Set Key)";
+        }
     }
 }
 
@@ -45,6 +56,7 @@ function promptApiKey() {
     const key = prompt("Mama, Enter your Gemini API Key for direct Antigravity Studio execution:");
     if (key) {
         localStorage.setItem("APTA_GEMINI_KEY", key.trim());
+        checkStatus();
         alert("API Key saved! Antigravity Studio is ready.");
     }
 }
@@ -72,10 +84,10 @@ async function executePrompt() {
             <span>${new Date().toLocaleTimeString()}</span>
         </div>
         <div class="cot-drawer">
-            <div class="cot-title" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'">
+            <div class="cot-title" onclick="const c = this.nextElementSibling; c.style.display = c.style.display === 'none' ? 'block' : 'none';">
                 <i class="fa-solid fa-brain"></i> Thinking / Chain-of-Thought Reasoning (Click to expand)
             </div>
-            <div class="cot-content" style="display: none; margin-top: 6px;">
+            <div class="cot-content" style="display: none; margin-top: 6px; padding: 6px; background: rgba(0,0,0,0.3); border-radius: 4px;">
                 Analyzing instruction '${text}', inspecting workspace trajectory, loading active skills (agy-customizations), and dispatching tool actions...
             </div>
         </div>
@@ -96,7 +108,7 @@ async function executePrompt() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message: text, mode: "universal" }),
-            signal: AbortSignal.timeout(4000)
+            signal: AbortSignal.timeout(3000)
         });
         const data = await response.json();
         hideActivity();
@@ -105,7 +117,7 @@ async function executePrompt() {
             return;
         }
     } catch (e) {
-        // Fallback to Web Client
+        // Fallback to Browser Direct Gemini API
     }
 
     // Direct Browser Gemini API
@@ -124,7 +136,7 @@ async function executePrompt() {
 
     try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-        const sysInstruction = "You are apta AI, an exact Twin of the Google DeepMind Antigravity AI Coding Assistant created by Rajwanth Balaka. Respond warmly in Teluglish or English with full step-by-step thinking.";
+        const sysInstruction = "You are apta AI, an exact Twin of the Google DeepMind Antigravity AI Coding Assistant created by Rajwanth Balaka. Respond warmly in Teluglish or English with step-by-step reasoning.";
 
         const res = await fetch(url, {
             method: "POST",
@@ -152,10 +164,15 @@ async function executePrompt() {
 function appendStepReply(stepBox, replyText) {
     const replyElem = document.createElement("div");
     replyElem.style.marginTop = "12px";
-    replyElem.innerHTML = marked.parse(replyText);
+    
+    if (typeof marked !== "undefined") {
+        replyElem.innerHTML = marked.parse(replyText);
+    } else {
+        replyElem.innerText = replyText;
+    }
+    
     stepBox.appendChild(replyElem);
 
-    // If response contains plan or artifact, update artifact drawer
     if (replyText.includes("Implementation Plan") || replyText.includes("# ")) {
         renderArtifact(replyText);
     }
@@ -163,7 +180,11 @@ function appendStepReply(stepBox, replyText) {
 
 function renderArtifact(content) {
     const drawerContent = document.getElementById("artifact-content");
-    drawerContent.innerHTML = marked.parse(content);
+    if (typeof marked !== "undefined") {
+        drawerContent.innerHTML = marked.parse(content);
+    } else {
+        drawerContent.innerText = content;
+    }
     if (!isDrawerOpen) toggleArtifactDrawer();
 }
 
