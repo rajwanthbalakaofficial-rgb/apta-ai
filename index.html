@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>apta AI - Antigravity Studio Engine</title>
+    <title>apta AI - Autonomous Neural AI Engine</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -16,15 +16,16 @@
                 <img src="logo.jpg" alt="apta AI Logo" class="brand-logo-img">
                 <div class="brand-info">
                     <h1>apta AI Studio</h1>
-                    <span class="version">ANTIGRAVITY TWIN ENGINE v2.0</span>
+                    <span class="version">NEURAL MODEL v2.0</span>
                 </div>
             </div>
 
             <div class="sidebar-block">
-                <label>MODEL SELECTOR</label>
+                <label>APTA NEURAL MODELS</label>
                 <select id="model-selector" class="model-select">
-                    <option value="gemini-2.5-flash">Gemini 2.5 Flash (High Speed)</option>
-                    <option value="gemini-2.5-pro">Gemini 2.5 Pro (Deep Reasoning)</option>
+                    <option value="apta-neural-2.0">apta Neural 2.0 (Universal AI)</option>
+                    <option value="apta-coder-3.0">apta Coder 3.0 (Deep Code Engine)</option>
+                    <option value="apta-reasoning-r1">apta Reasoning R1 (Deep Thinking)</option>
                 </select>
             </div>
 
@@ -45,7 +46,7 @@
             </div>
 
             <div class="sidebar-block">
-                <label>ANTIGRAVITY TOOLS (7)</label>
+                <label>ENGINE TOOLS (7)</label>
                 <ul class="tool-list">
                     <li><i class="fa-regular fa-file-code"></i> view_file</li>
                     <li><i class="fa-solid fa-retweet"></i> replace_file_content</li>
@@ -60,9 +61,9 @@
             <div class="sidebar-footer">
                 <div class="workspace-status">
                     <span class="dot green"></span>
-                    <span id="api-status-text">Workspace Connected</span>
+                    <span id="api-status-text">apta Engine Active</span>
                 </div>
-                <div class="creator-tag">Antigravity Twin Engine by Rajwanth Balaka</div>
+                <div class="creator-tag">Proprietary AI Engine by Rajwanth Balaka</div>
             </div>
         </aside>
 
@@ -70,13 +71,10 @@
         <main class="workspace-feed">
             <header class="feed-header">
                 <div class="header-title">
-                    <h2>Antigravity Trajectory Stream</h2>
+                    <h2>apta Neural Trajectory Stream</h2>
                     <span class="trajectory-badge" id="step-badge">STEP 1</span>
                 </div>
                 <div class="header-actions">
-                    <button class="action-btn" onclick="promptApiKey()">
-                        <i class="fa-solid fa-key"></i> API Key
-                    </button>
                     <button class="action-btn" onclick="toggleArtifactDrawer()">
                         <i class="fa-solid fa-box-archive"></i> Artifacts Drawer
                     </button>
@@ -87,8 +85,8 @@
             <div class="feed-container" id="feed-container">
                 <div class="welcome-banner">
                     <img src="logo.jpg" alt="apta AI Mascot" class="welcome-banner-img">
-                    <h2>Namaste / Hello Mama! Welcome to apta AI Antigravity Studio!</h2>
-                    <p>I am your exact Antigravity Twin Engine & Pair Programming Assistant created by Rajwanth Balaka.</p>
+                    <h2>Namaste / Hello Mama! Welcome to apta AI Studio!</h2>
+                    <p>I am apta AI — an independent, proprietary Autonomous AI Engine created by Rajwanth Balaka.</p>
                     
                     <div class="slash-commands-grid">
                         <div class="command-card" onclick="triggerSlashCommand('/plan')">
@@ -114,7 +112,7 @@
             <!-- Thinking & Tool Activity Toast -->
             <div class="activity-toast" id="activity-toast" style="display: none;">
                 <i class="fa-solid fa-brain fa-spin"></i>
-                <span id="activity-toast-text">Antigravity Thinking & Trajectory Processing...</span>
+                <span id="activity-toast-text">apta Neural Model Thinking & Processing...</span>
             </div>
 
             <!-- Bottom Prompt Input -->
